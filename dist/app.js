@@ -1,27 +1,32 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 var createError = require("http-errors");
-var express = require("express");
+const express_1 = __importDefault(require("express"));
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var app = express();
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+const mongoose = require("mongoose");
+require("dotenv").config();
+//set up database
+mongoose.connect(process.env.DB_KEY, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+});
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "mongo connection error"));
+var app = (0, express_1.default)();
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use(express_1.default.static(path.join(__dirname, "public")));
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
 });
-// error handler
 app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
